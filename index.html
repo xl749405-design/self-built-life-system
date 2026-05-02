@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#8a5a3b"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="人生系统"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<title>人生系统仪表盘</title>
+<style>
+:root{
+  --bg:#f5f1ea; --card:#fffaf2; --text:#29231f; --muted:#74695f;
+  --line:#e4d8ca; --accent:#8a5a3b; --accent2:#b7794f;
+  --danger:#a43a2e; --warn:#a56516; --ok:#2f7049; --blue:#345f82;
+  --shadow:0 12px 32px rgba(48,35,20,.08); --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Arial,sans-serif;line-height:1.56}
+body{padding-bottom:80px}
+header{position:sticky;top:0;z-index:20;background:rgba(245,241,234,.94);backdrop-filter:blur(10px);border-bottom:1px solid rgba(228,216,202,.8)}
+.header-inner{max-width:1180px;margin:auto;padding:14px 16px 10px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+h1{font-size:22px;margin:0}.sub{font-size:13px;color:var(--muted);margin-top:2px}.date{background:var(--accent);color:white;border-radius:999px;padding:8px 12px;font-size:13px;white-space:nowrap}
+nav{max-width:1180px;margin:auto;padding:0 16px 12px;display:flex;gap:8px;overflow-x:auto}
+nav button{border:1px solid var(--line);background:#fffaf2;color:var(--text);padding:9px 12px;border-radius:999px;white-space:nowrap;cursor:pointer}
+nav button.active{background:var(--accent);color:white;border-color:var(--accent)}
+main{max-width:1180px;margin:auto;padding:14px 16px}.page{display:none}.page.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:14px 0}
+h2{font-size:19px;margin:0 0 10px} h3{font-size:16px;margin:16px 0 8px} p{margin:8px 0}
+.muted{color:var(--muted);font-size:13px}.small{font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+label{font-weight:700;font-size:14px;display:block;margin:10px 0 6px}
+textarea,input,select{width:100%;border:1px solid var(--line);background:#fffdf9;border-radius:12px;padding:11px;font-size:16px;color:var(--text);outline:none}
+textarea{min-height:92px;resize:vertical}
+textarea:focus,input:focus,select:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(183,121,79,.16)}
+button.primary,button.secondary,button.danger,button.ghost{border:0;border-radius:12px;padding:10px 13px;cursor:pointer;font-size:14px}
+button.primary{background:var(--accent);color:white} button.secondary{background:#eadccc;color:var(--text)}
+button.danger{background:#f1d7d2;color:var(--danger)} button.ghost{background:#fffaf2;border:1px solid var(--line);color:var(--accent)}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.quote{border-left:4px solid var(--accent);background:#fff4e6;border-radius:12px;padding:10px 12px;margin:10px 0}
+.notice{background:#fff6e6;border:1px solid #ecd0a8;border-radius:14px;padding:12px}
+.dangerbox{background:#fff0ed;border:1px solid #e3b8b1;border-radius:14px;padding:12px;color:#653026}
+.okbox{background:#eefaf2;border:1px solid #b7d8c2;border-radius:14px;padding:12px;color:#244a33}
+.pill{display:inline-flex;border:1px solid var(--line);background:#fffdf9;border-radius:999px;padding:4px 9px;font-size:12px;margin:2px;color:var(--muted)}
+.pill.danger{color:var(--danger);background:#fff2ef;border-color:#e1b2aa}.pill.warn{color:var(--warn);background:#fff8ea;border-color:#e4c38c}.pill.ok{color:var(--ok);background:#effbf3;border-color:#b6d6bf}.pill.blue{color:var(--blue);background:#f0f7ff;border-color:#b7ccde}
+.kpi{background:#fffdf9;border:1px solid var(--line);border-radius:16px;padding:14px}.kpi strong{font-size:24px;display:block}.kpi span{font-size:13px;color:var(--muted)}
+.table{width:100%;border-collapse:collapse;font-size:14px}.table th,.table td{border-bottom:1px solid var(--line);padding:9px;text-align:left;vertical-align:top}.table th{color:var(--muted)}
+.item{border-top:1px solid var(--line);padding:12px 0;display:grid;grid-template-columns:1fr auto;gap:10px}.item:first-child{border-top:0}.item-title{font-weight:800}.item-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.copybox{white-space:pre-wrap;background:#fffdf9;border:1px solid var(--line);border-radius:12px;padding:12px;min-height:90px}
+.module-card{cursor:pointer;transition:.15s}.module-card:hover{transform:translateY(-1px)}
+.night{background:linear-gradient(135deg,#222436,#423046);color:white;border-color:rgba(255,255,255,.16)}
+.night .muted,.night label{color:rgba(255,255,255,.78)}.night textarea,.night input,.night select{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:white}
+.night .quote{background:rgba(255,255,255,.08);color:white;border-left-color:#f3d6a6}.night button.secondary{background:rgba(255,255,255,.16);color:white}
+.footer{text-align:center;color:var(--muted);font-size:12px;margin:18px 0}.hidden{display:none!important}
+.install{display:none}
+@media(max-width:860px){
+  .grid,.grid3,.grid4{grid-template-columns:1fr}.item{grid-template-columns:1fr}.item-actions{justify-content:flex-start}
+  .header-inner{align-items:flex-start}h1{font-size:20px}.date{font-size:12px;padding:7px 10px}
+  main{padding:12px}.card{padding:14px;border-radius:16px}
+}
+@media print{header,nav,.btns,.no-print{display:none!important}.page{display:block}.card{box-shadow:none;break-inside:avoid}body{background:white}}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div><h1>人生系统仪表盘</h1><div class="sub">把“我完了”拆成系统、排序、下一步</div></div>
+    <div class="date" id="dateBadge"></div>
+  </div>
+  <nav>
+    <button class="active" data-tab="home">总览</button>
+    <button data-tab="m1">1 夜晚规则</button>
+    <button data-tab="m2">2 系统视角</button>
+    <button data-tab="m3">3 现实优先级</button>
+    <button data-tab="m4">4 最小行动</button>
+    <button data-tab="m5">5 每日仪表盘</button>
+    <button data-tab="m6">6 周复盘</button>
+    <button data-tab="m7">7 情绪/事实</button>
+    <button data-tab="m8">8 长期系统</button>
+    <button data-tab="data">备份/安装</button>
+  </nav>
+</header>
+
+<main>
+<section id="home" class="page active">
+  <div class="card">
+    <h2>核心原则</h2>
+    <div class="quote">你不是没有目标，而是目标太多、截止期太挤、情绪系统过载。这个 App 的作用是：不再用情绪判断人生，而是用系统安排行动。</div>
+    <div class="grid4">
+      <div class="kpi"><strong id="openTasks">0</strong><span>未完成任务</span></div>
+      <div class="kpi"><strong id="urgentTasks">0</strong><span>紧急层任务</span></div>
+      <div class="kpi"><strong id="todayEnergy">-</strong><span>今日能量</span></div>
+      <div class="kpi"><strong id="lastEmotion">-</strong><span>最近情绪</span></div>
+    </div>
+  </div>
+  <div class="grid">
+    <div class="card module-card" onclick="tab('m1')"><h2>1. 夜晚不审判人生</h2><p>晚上只做记录和降温，不做重大判断。</p></div>
+    <div class="card module-card" onclick="tab('m2')"><h2>2. 用系统视角看问题</h2><p>拆成紧急层、近期层、长期层、心理层。</p></div>
+    <div class="card module-card" onclick="tab('m3')"><h2>3. 现实优先级</h2><p>按截止期和后果排序，不按内疚排序。</p></div>
+    <div class="card module-card" onclick="tab('m4')"><h2>4. 最低行动系统</h2><p>把大任务改写成 5—20 分钟动作。</p></div>
+    <div class="card module-card" onclick="tab('m5')"><h2>5. 个人仪表盘</h2><p>每天只记录最关键的五项。</p></div>
+    <div class="card module-card" onclick="tab('m6')"><h2>6. 周复盘</h2><p>一周一次调整系统，不每天审判。</p></div>
+    <div class="card module-card" onclick="tab('m7')"><h2>7. 区分情绪和事实</h2><p>情绪可以存在，但不能直接下命令。</p></div>
+    <div class="card module-card" onclick="tab('m8')"><h2>8. 长期系统</h2><p>从学业、资格、能量、情绪四个系统开始。</p></div>
+  </div>
+  <div class="card">
+    <h2>一键生成今日系统卡</h2>
+    <div class="btns">
+      <button class="primary" onclick="generateSystemCard()">生成</button>
+      <button class="secondary" onclick="copyText('systemCard')">复制</button>
+    </div>
+    <div class="copybox" id="systemCard">点击生成后，这里会出现一张可以截图/复制的系统卡。</div>
+  </div>
+</section>
+
+<section id="m1" class="page">
+  <div class="card" id="nightCard">
+    <h2>1. 夜晚不审判人生</h2>
+    <div class="quote">晚上只做记录和降温，不做重大判断。人生规划、放弃、否定自己，都必须白天再讨论。</div>
+    <div class="btns"><button class="primary" onclick="toggleNight()">开启/关闭夜晚模式</button><button class="secondary" onclick="fillNightTemplate()">填入今晚模板</button></div>
+    <label>我现在在焦虑什么？</label><textarea id="nightWorry"></textarea>
+    <label>这件事里，明天白天再判断的部分是什么？</label><textarea id="nightJudgeLater"></textarea>
+    <label>今晚只允许做的降温动作</label><textarea id="nightCalmAction"></textarea>
+    <label>明天第一步</label><textarea id="nightTomorrow"></textarea>
+    <div class="btns"><button class="primary" onclick="saveNight()">保存夜晚记录</button><button class="secondary" onclick="makeNightCard()">生成夜晚降温卡</button></div>
+    <h3>夜晚降温卡</h3><div class="copybox" id="nightOutput"></div>
+  </div>
+  <div class="card"><h2>夜晚记录</h2><div id="nightLogs"></div></div>
+</section>
+
+<section id="m2" class="page">
+  <div class="card">
+    <h2>2. 用系统视角看现在的问题</h2>
+    <div class="notice">不要把问题概括成“我完了”。要拆成：紧急层、近期层、长期层、心理层。</div>
+    <table class="table">
+      <tr><th>层级</th><th>含义</th><th>现在例子</th></tr>
+      <tr><td>紧急层</td><td>今天/三天内不做会爆雷</td><td>论文提交、答辩</td></tr>
+      <tr><td>近期层</td><td>十几天/一个月内需要处理</td><td>教资面试</td></tr>
+      <tr><td>长期层</td><td>重要但不是今天爆雷</td><td>二战考研</td></tr>
+      <tr><td>心理层</td><td>影响执行的情绪和能量</td><td>焦虑、内疚、拖延、失控感</td></tr>
+    </table>
+    <div class="grid">
+      <div><label>紧急层</label><textarea id="layerUrgent"></textarea></div>
+      <div><label>近期层</label><textarea id="layerNear"></textarea></div>
+      <div><label>长期层</label><textarea id="layerLong"></textarea></div>
+      <div><label>心理层</label><textarea id="layerMind"></textarea></div>
+    </div>
+    <div class="btns"><button class="primary" onclick="saveLayers()">保存系统分层</button><button class="secondary" onclick="fillLayers()">填入当前默认分层</button></div>
+  </div>
+</section>
+
+<section id="m3" class="page">
+  <div class="card">
+    <h2>3. 现实优先级</h2>
+    <div class="dangerbox">优先级不是价值排序，而是截止时间和后果排序。最近的火先灭。</div>
+    <div class="grid">
+      <div><label>任务名称</label><input id="taskTitle" placeholder="例如：论文定稿"></div>
+      <div><label>所属层级</label><select id="taskLayer"><option value="urgent">紧急层</option><option value="near">近期层</option><option value="long">长期层</option><option value="mind">心理层</option></select></div>
+      <div><label>截止日期</label><input id="taskDeadline" type="date"></div>
+      <div><label>重要程度：<span id="importanceVal">3</span>/5</label><input id="taskImportance" type="range" min="1" max="5" value="3"></div>
+    </div>
+    <label>下一步动作</label><input id="taskNext" placeholder="必须是具体动作，如：打开论文，检查目录">
+    <label>备注/卡住原因</label><textarea id="taskNote" placeholder="不会、害怕、任务太大、没时间，还是逃避？"></textarea>
+    <div class="btns"><button class="primary" onclick="addTask()">添加任务</button><button class="secondary" onclick="seedTasks()">加入当前核心任务</button></div>
+  </div>
+  <div class="card"><h2>按系统排序后的任务队列</h2><div id="taskList"></div></div>
+</section>
+
+<section id="m4" class="page">
+  <div class="card">
+    <h2>4. 最低行动系统</h2>
+    <div class="quote">焦虑状态下，大脑无法执行宏大计划，只能执行具体动作。把所有任务拆成 5—20 分钟能开始的动作。</div>
+    <div class="grid">
+      <div><label>我脑子里的大任务/大恐惧</label><textarea id="bigTask" placeholder="例如：我要把论文写完"></textarea></div>
+      <div><label>改写成 5—20 分钟动作</label><textarea id="smallAction" placeholder="例如：打开论文，只检查摘要和结论是否对应"></textarea></div>
+    </div>
+    <label>做完这个动作后，我就允许自己停止/休息多久？</label><input id="stopRule" placeholder="例如：做完15分钟就停止，不加码。">
+    <div class="btns"><button class="primary" onclick="saveSmallAction()">保存最小行动</button><button class="secondary" onclick="generateSmallAction()">帮我改写</button></div>
+  </div>
+  <div class="card"><h2>最小行动库</h2><div id="smallActionList"></div></div>
+</section>
+
+<section id="m5" class="page">
+  <div class="card">
+    <h2>5. 个人仪表盘</h2>
+    <div class="notice">每天只写五栏：最急任务、最重要任务、最小动作、情绪状态、明天第一步。</div>
+    <div class="grid">
+      <div><label>今天最急任务</label><textarea id="dailyUrgent"></textarea></div>
+      <div><label>今天最重要任务</label><textarea id="dailyImportant"></textarea></div>
+      <div><label>现在马上能做的最小动作</label><textarea id="dailyMin"></textarea></div>
+      <div><label>明天第一步</label><textarea id="dailyTomorrow"></textarea></div>
+    </div>
+    <div class="grid">
+      <div><label>当前情绪</label><select id="dailyEmotion"><option>焦虑</option><option>麻木</option><option>害怕</option><option>疲惫</option><option>内疚</option><option>平稳</option><option>能行动一点</option></select></div>
+      <div><label>能量值：<span id="energyVal">5</span>/10</label><input id="dailyEnergy" type="range" min="1" max="10" value="5"></div>
+    </div>
+    <label>备注</label><textarea id="dailyNote" placeholder="例如：我现在不是人生完蛋，而是任务系统过载。"></textarea>
+    <div class="btns"><button class="primary" onclick="saveDaily()">保存今日仪表盘</button><button class="secondary" onclick="fillDaily()">填入今天默认版</button></div>
+  </div>
+  <div class="card"><h2>每日记录</h2><div id="dailyLogs"></div></div>
+</section>
+
+<section id="m6" class="page">
+  <div class="card">
+    <h2>6. 每周一次系统复盘</h2>
+    <div class="notice">不要每天晚上审判自己。一周做一次复盘：不是骂自己，而是调整系统。</div>
+    <label>这周最重要的截止期是什么？</label><textarea id="weekDeadline"></textarea>
+    <label>我实际完成了什么？不要只看没完成的。</label><textarea id="weekDone"></textarea>
+    <label>我卡住的原因是什么：不会、害怕、太大、没时间，还是逃避？</label><textarea id="weekStuck"></textarea>
+    <label>下周只保三个重点</label><textarea id="weekTop3" placeholder="1.&#10;2.&#10;3."></textarea>
+    <label>每个重点的第一个动作</label><textarea id="weekNext" placeholder="1.&#10;2.&#10;3."></textarea>
+    <label>下周系统调整</label><textarea id="weekAdjust"></textarea>
+    <div class="btns"><button class="primary" onclick="saveWeekly()">保存周复盘</button><button class="secondary" onclick="fillWeekly()">填入复盘模板</button></div>
+  </div>
+  <div class="card"><h2>历史周复盘</h2><div id="weeklyLogs"></div></div>
+</section>
+
+<section id="m7" class="page">
+  <div class="card">
+    <h2>7. 区分情绪和事实</h2>
+    <div class="quote">情绪可以存在，但它不能直接下命令。你要把“情绪判断”改写成“事实描述 + 下一步动作”。</div>
+    <div class="grid">
+      <div><label>情绪判断</label><textarea id="emotionJudge" placeholder="例如：我完了。"></textarea></div>
+      <div><label>事实描述</label><textarea id="factDesc"></textarea></div>
+      <div><label>更合理的解释</label><textarea id="betterExplain"></textarea></div>
+      <div><label>下一步动作</label><textarea id="emotionNext"></textarea></div>
+    </div>
+    <label>焦虑强度：<span id="intensityVal">7</span>/10</label><input id="intensity" type="range" min="1" max="10" value="7">
+    <div class="btns"><button class="primary" onclick="saveEmotion()">保存情绪/事实记录</button><button class="secondary" onclick="fillEmotion()">填入当前模板</button></div>
+  </div>
+  <div class="card">
+    <h2>情绪 vs 事实 对照</h2>
+    <table class="table">
+      <tr><th>情绪说</th><th>事实可能是</th></tr>
+      <tr><td>我完了</td><td>我有几个任务严重拖延，但现在开始仍能降低损失</td></tr>
+      <tr><td>我什么都做不好</td><td>我在高压下启动困难，需要更小的第一步</td></tr>
+      <tr><td>现在开始也没用了</td><td>不能保证完美，但能减少后果</td></tr>
+      <tr><td>我总是这样</td><td>我缺少稳定系统和反馈机制，不等于永远改不了</td></tr>
+      <tr><td>我不配休息</td><td>没有恢复会更难行动，休息要和最低交付绑定</td></tr>
+    </table>
+  </div>
+  <div class="card"><h2>情绪/事实记录</h2><div id="emotionLogs"></div></div>
+</section>
+
+<section id="m8" class="page">
+  <div class="card">
+    <h2>8. 长期规划从系统开始</h2>
+    <div class="notice">先设计四个系统：学业系统、资格系统、能量系统、情绪系统。长期规划不是一句“我要逆袭”，而是这些系统每周如何运转。</div>
+    <div class="grid">
+      <div><label>学业系统：论文、答辩、考研、课程</label><textarea id="sysStudy"></textarea></div>
+      <div><label>资格系统：教资、证书、考试</label><textarea id="sysCert"></textarea></div>
+      <div><label>能量系统：睡眠、社交、运动、恢复</label><textarea id="sysEnergy"></textarea></div>
+      <div><label>情绪系统：焦虑、内疚、拖延、失控感</label><textarea id="sysEmotion"></textarea></div>
+    </div>
+    <label>未来 30 天的系统目标</label><textarea id="sys30"></textarea>
+    <label>未来 7 天的最低运行版本</label><textarea id="sys7"></textarea>
+    <div class="btns"><button class="primary" onclick="saveLongSystem()">保存长期系统</button><button class="secondary" onclick="fillLongSystem()">填入当前版本</button></div>
+  </div>
+  <div class="card">
+    <h2>长期系统当前版本</h2>
+    <div id="longSystemView"></div>
+  </div>
+</section>
+
+<section id="data" class="page">
+  <div class="card">
+    <h2>备份与安装</h2>
+    <div class="okbox">
+      <p><strong>iPad 正确使用方式：</strong>这个版本要先部署成一个网页地址，然后用 Safari 打开，才能“添加到主屏幕”。不要直接点本地 HTML，否则可能被 WPS 接管。</p>
+      <p><strong>数据保存：</strong>输入内容保存在 Safari 本地存储里。建议每周导出一次 JSON 备份。</p>
+    </div>
+    <div class="btns">
+      <button class="primary" onclick="downloadBackup()">导出 JSON 备份</button>
+      <button class="secondary" onclick="document.getElementById('importFile').click()">导入 JSON 备份</button>
+      <button class="danger" onclick="resetAll()">清空全部数据</button>
+    </div>
+    <input class="hidden" id="importFile" type="file" accept="application/json" onchange="importBackup(event)">
+  </div>
+  <div class="card">
+    <h2>安全提醒</h2>
+    <p class="muted">这个工具用于自我记录和任务管理，不能替代专业心理咨询或医疗帮助。如果出现强烈自伤念头、无法保证安全，或持续失眠和崩溃，请立刻联系身边可信的人、学校心理中心、当地紧急电话；在美国可拨打或短信 988。</p>
+  </div>
+</section>
+
+<div class="footer">人生系统仪表盘 · PWA 网页 App</div>
+</main>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+const KEY="life_system_pwa_v1";
+const today=()=>new Date().toISOString().slice(0,10);
+const now=()=>new Date().toLocaleString("zh-CN",{hour12:false});
+function initial(){return{daily:{},tasks:[],nightLogs:[],smallActions:[],weekly:[],emotions:[],layers:{},longSystem:{}}}
+let state=(()=>{try{return Object.assign(initial(),JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){return initial()}})();
+function save(){localStorage.setItem(KEY,JSON.stringify(state));render();}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function msg(t){const d=document.createElement("div");d.textContent=t;d.style.cssText="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#29231f;color:white;padding:10px 14px;border-radius:999px;z-index:99;font-size:14px";document.body.appendChild(d);setTimeout(()=>d.remove(),1600)}
+function tab(id){document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===id));scrollTo({top:0,behavior:"smooth"})}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+$("dateBadge").textContent=new Date().toLocaleDateString("zh-CN",{year:"numeric",month:"long",day:"numeric",weekday:"long"});
+$("taskImportance").oninput=e=>$("importanceVal").textContent=e.target.value;
+$("dailyEnergy").oninput=e=>$("energyVal").textContent=e.target.value;
+$("intensity").oninput=e=>$("intensityVal").textContent=e.target.value;
+function daysLeft(d){if(!d)return 999;return Math.ceil((new Date(d)-new Date(today()))/86400000)}
+function score(t){const lw={urgent:80,near:45,long:20,mind:25}[t.layer]||0;const d=daysLeft(t.deadline);const dw=d<0?50:d<=1?45:d<=3?35:d<=14?22:d<=30?12:0;return lw+dw+(+t.importance||3)*8}
+function layerName(x){return{urgent:"紧急层",near:"近期层",long:"长期层",mind:"心理层"}[x]||x}
+function layerCls(x){return{urgent:"danger",near:"warn",long:"blue",mind:"ok"}[x]||""}
+function saveNight(){state.nightLogs.unshift({time:now(),worry:$("nightWorry").value,judgeLater:$("nightJudgeLater").value,calm:$("nightCalmAction").value,tomorrow:$("nightTomorrow").value});save();msg("夜晚记录已保存")}
+function toggleNight(){$("nightCard").classList.toggle("night")}
+function fillNightTemplate(){$("nightWorry").value="我把论文、答辩、教资、考研全混在一起，觉得自己完了。";$("nightJudgeLater").value="考研长期规划、教资最终准备效果，明天白天再判断。";$("nightCalmAction").value="洗漱、喝水、把论文文件保存好，只写明天第一步。";$("nightTomorrow").value="9:00 打开论文，先处理最影响提交的部分。"}
+function makeNightCard(){let t=`【夜晚降温卡｜${now()}】\n\n我现在焦虑的是：\n${$("nightWorry").value||"未填写"}\n\n明天白天再判断：\n${$("nightJudgeLater").value||"未填写"}\n\n今晚只做：\n${$("nightCalmAction").value||"未填写"}\n\n明天第一步：\n${$("nightTomorrow").value||"未填写"}\n\n规则：晚上只做记录和降温，不做重大人生判断。`; $("nightOutput").textContent=t}
+function saveLayers(){state.layers={urgent:$("layerUrgent").value,near:$("layerNear").value,long:$("layerLong").value,mind:$("layerMind").value,updated:now()};save();msg("系统分层已保存")}
+function fillLayers(){$("layerUrgent").value="论文提交、三天后答辩";$("layerNear").value="教资面试，剩十几天";$("layerLong").value="二战考研，答辩后重启规划";$("layerMind").value="焦虑、内疚、拖延、失控感、睡不着"}
+function addTask(){let title=$("taskTitle").value.trim();if(!title){msg("先写任务名称");return}state.tasks.push({id:String(Date.now()+Math.random()),title,layer:$("taskLayer").value,deadline:$("taskDeadline").value,importance:$("taskImportance").value,next:$("taskNext").value,note:$("taskNote").value,done:false,created:now()});["taskTitle","taskDeadline","taskNext","taskNote"].forEach(id=>$(id).value="");save();msg("任务已添加")}
+function seedTasks(){let seeds=[
+ ["论文提交/定稿","urgent","打开论文，检查目录、摘要、结论、参考文献和模板格式","目标不是完美，而是能提交。"],
+ ["答辩准备","urgent","写3—5分钟自述稿，并列出10个可能问题","能讲清楚研究什么、为什么做、怎么做、结论和不足。"],
+ ["教资面试保留火种","near","今天只练1道结构化或看20分钟模板","论文答辩后集中冲刺，不等于放弃。"],
+ ["二战考研重启","long","答辩前暂停内疚，答辩后确认科目和第一周计划","长期任务不能抢走最近截止期的注意力。"]
+];let exist=new Set(state.tasks.map(t=>t.title));seeds.forEach(s=>{if(!exist.has(s[0]))state.tasks.push({id:String(Date.now()+Math.random()),title:s[0],layer:s[1],deadline:"",importance:5,next:s[2],note:s[3],done:false,created:now()})});save();msg("已加入核心任务")}
+function toggleDone(id){let t=state.tasks.find(x=>x.id===id);if(t){t.done=!t.done;save()}}
+function delTask(id){if(confirm("删除这个任务？")){state.tasks=state.tasks.filter(t=>t.id!==id);save()}}
+function saveSmallAction(){state.smallActions.unshift({time:now(),big:$("bigTask").value,small:$("smallAction").value,stop:$("stopRule").value});save();msg("最小行动已保存")}
+function generateSmallAction(){let big=$("bigTask").value.trim();$("smallAction").value= big ? `只做 15 分钟：打开与“${big}”相关的第一个文件/材料，列出接下来 3 个小步骤，不要求完成。` : "先写出一个具体对象：打开哪个文件、看哪一页、写哪100字、发哪条消息。";$("stopRule").value="做完 15 分钟就允许停止，不加码。"}
+function saveDaily(){state.daily[today()]={time:now(),urgent:$("dailyUrgent").value,important:$("dailyImportant").value,min:$("dailyMin").value,tomorrow:$("dailyTomorrow").value,emotion:$("dailyEmotion").value,energy:$("dailyEnergy").value,note:$("dailyNote").value};save();msg("今日仪表盘已保存")}
+function fillDaily(){$("dailyUrgent").value="论文提交/答辩相关的最近截止任务";$("dailyImportant").value="保住毕业流程与答辩资格";$("dailyMin").value="打开论文，先处理最影响提交的一处";$("dailyTomorrow").value="起床后先打开论文/答辩材料，不查经验帖";$("dailyNote").value="我现在不是人生完蛋，而是任务系统过载。"}
+function saveWeekly(){state.weekly.unshift({time:now(),deadline:$("weekDeadline").value,done:$("weekDone").value,stuck:$("weekStuck").value,top3:$("weekTop3").value,next:$("weekNext").value,adjust:$("weekAdjust").value});save();msg("周复盘已保存")}
+function fillWeekly(){$("weekDeadline").value="本周最重要的截止期是：";$("weekDone").value="我实际完成了：";$("weekStuck").value="我卡住的原因可能是：任务太大 / 害怕失败 / 不知道第一步 / 时间安排混乱";$("weekTop3").value="1. \n2. \n3. ";$("weekNext").value="1. \n2. \n3. ";$("weekAdjust").value="晚上不做人生判断；最重要任务放上午；出去玩前先完成一个最低交付。"}
+function saveEmotion(){state.emotions.unshift({time:now(),judge:$("emotionJudge").value,fact:$("factDesc").value,explain:$("betterExplain").value,next:$("emotionNext").value,intensity:$("intensity").value});save();msg("情绪/事实记录已保存")}
+function fillEmotion(){$("emotionJudge").value="我完了，现在开始也没用了。";$("factDesc").value="论文、答辩、教资、考研四件事叠加，截止期不同，需要排序。";$("betterExplain").value="不是我没救，而是任务系统过载、优先级混乱、情绪在放大后果。";$("emotionNext").value="先处理最近截止期：打开论文，检查最影响提交的部分。"}
+function saveLongSystem(){state.longSystem={time:now(),study:$("sysStudy").value,cert:$("sysCert").value,energy:$("sysEnergy").value,emotion:$("sysEmotion").value,sys30:$("sys30").value,sys7:$("sys7").value};save();msg("长期系统已保存")}
+function fillLongSystem(){$("sysStudy").value="每周检查：哪个截止期最近？哪个任务最影响毕业？哪个最影响长期目标？";$("sysCert").value="教资是近期重要资格；论文答辩前保留最低动作，答辩后集中冲刺。";$("sysEnergy").value="白天社交前完成一个最低交付；晚上回来只记录和降温，不复盘人生。";$("sysEmotion").value="焦虑是报警器，不是命令。报警后检查系统：排序、拆分、下一步。";$("sys30").value="完成论文答辩；完成教资面试冲刺；考研恢复稳定启动。";$("sys7").value="第1天论文提交；第2—3天答辩；答辩后教资优先；考研只保留最低动作。"}
+function generateSystemCard(){const d=state.daily[today()]||{};const tasks=[...state.tasks].filter(t=>!t.done).sort((a,b)=>score(b)-score(a)).slice(0,3);$("systemCard").textContent=`【今日人生系统卡｜${today()}】\n\n核心规则：\n晚上不审判人生；情绪可以存在，但不能直接下命令。\n\n今日最急：\n${d.urgent||"未填写"}\n\n今日最重要：\n${d.important||"未填写"}\n\n当前最小动作：\n${d.min||"未填写"}\n\n任务队列前三：\n${tasks.length?tasks.map((t,i)=>`${i+1}. ${t.title}｜${layerName(t.layer)}｜下一步：${t.next||"未填写"}`).join("\n"):"暂无任务"}\n\n情绪/能量：\n${d.emotion||"未填写"}｜${d.energy||"-"}/10\n\n明天第一步：\n${d.tomorrow||"未填写"}\n\n一句话：\n我现在不是人生完蛋，而是任务系统过载；先处理最近截止期，再恢复长期规划。`;}
+function copyText(id){navigator.clipboard.writeText($(id).textContent||"").then(()=>msg("已复制"))}
+function downloadBackup(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`life-system-backup-${today()}.json`;a.click();URL.revokeObjectURL(a.href)}
+function importBackup(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=Object.assign(initial(),JSON.parse(r.result));save();msg("导入成功")}catch(err){alert("导入失败：文件格式不对")}};r.readAsText(f)}
+function resetAll(){if(confirm("确定清空全部数据？此操作不可恢复。")){state=initial();save();msg("已清空")}}
+function renderList(arr, renderItem, empty="暂无记录"){return arr&&arr.length?arr.map(renderItem).join(""):`<p class="muted">${empty}</p>`}
+function render(){
+ const d=state.daily[today()]||{};$("openTasks").textContent=state.tasks.filter(t=>!t.done).length;$("urgentTasks").textContent=state.tasks.filter(t=>!t.done&&t.layer==="urgent").length;$("todayEnergy").textContent=d.energy?`${d.energy}/10`:"-";$("lastEmotion").textContent=d.emotion || (state.emotions[0]?.judge? "已记录":"-");
+ $("nightLogs").innerHTML=renderList(state.nightLogs,x=>`<div class="item"><div><div class="item-title">${esc(x.time)}</div><div class="small"><b>焦虑：</b>${esc(x.worry)}</div><div class="small"><b>今晚只做：</b>${esc(x.calm)}</div><div class="small"><b>明天第一步：</b>${esc(x.tomorrow)}</div></div></div>`);
+ $("taskList").innerHTML=renderList([...state.tasks].sort((a,b)=>score(b)-score(a)),t=>{let d=daysLeft(t.deadline);let dp=t.deadline?`<span class="pill ${d<=3?"danger":d<=14?"warn":"blue"}">截止 ${esc(t.deadline)}${d<999?`｜${d<0?"已过期":"剩"+d+"天"}`:""}</span>`:"";return `<div class="item"><div><div class="item-title">${t.done?"✅ ":""}${esc(t.title)}</div><div><span class="pill ${layerCls(t.layer)}">${layerName(t.layer)}</span><span class="pill">重要 ${esc(t.importance)}/5</span>${dp}</div><div class="small"><b>下一步：</b>${esc(t.next)}</div>${t.note?`<div class="muted">${esc(t.note)}</div>`:""}</div><div class="item-actions"><button class="secondary" onclick="toggleDone('${t.id}')">${t.done?"恢复":"完成"}</button><button class="danger" onclick="delTask('${t.id}')">删除</button></div></div>`},"暂无任务。先添加一个最近截止期任务。");
+ $("smallActionList").innerHTML=renderList(state.smallActions,x=>`<div class="item"><div><div class="item-title">${esc(x.time)}</div><div class="small"><b>大任务：</b>${esc(x.big)}</div><div class="small"><b>最小动作：</b>${esc(x.small)}</div><div class="muted">${esc(x.stop)}</div></div></div>`);
+ $("dailyLogs").innerHTML=renderList(Object.values(state.daily).sort((a,b)=>(b.time||"").localeCompare(a.time||"")),x=>`<div class="item"><div><div class="item-title">${esc(x.time)}</div><div class="small"><b>最急：</b>${esc(x.urgent)}</div><div class="small"><b>最小动作：</b>${esc(x.min)}</div><div class="small"><b>情绪：</b>${esc(x.emotion)}｜能量 ${esc(x.energy)}/10</div><div class="small"><b>明天：</b>${esc(x.tomorrow)}</div></div></div>`);
+ $("weeklyLogs").innerHTML=renderList(state.weekly,x=>`<div class="item"><div><div class="item-title">${esc(x.time)}</div><div class="small"><b>截止期：</b>${esc(x.deadline)}</div><div class="small"><b>完成：</b>${esc(x.done)}</div><div class="small"><b>下周三重点：</b><br>${esc(x.top3).replaceAll("\\n","<br>")}</div><div class="small"><b>系统调整：</b>${esc(x.adjust)}</div></div></div>`);
+ $("emotionLogs").innerHTML=renderList(state.emotions,x=>`<div class="item"><div><div class="item-title">${esc(x.time)}｜强度 ${esc(x.intensity)}/10</div><div class="small"><b>情绪：</b>${esc(x.judge)}</div><div class="small"><b>事实：</b>${esc(x.fact)}</div><div class="small"><b>解释：</b>${esc(x.explain)}</div><div class="small"><b>下一步：</b>${esc(x.next)}</div></div></div>`);
+ const ls=state.longSystem||{};$("longSystemView").innerHTML=ls.time?`<p class="muted">更新时间：${esc(ls.time)}</p><table class="table"><tr><th>系统</th><th>内容</th></tr><tr><td>学业系统</td><td>${esc(ls.study)}</td></tr><tr><td>资格系统</td><td>${esc(ls.cert)}</td></tr><tr><td>能量系统</td><td>${esc(ls.energy)}</td></tr><tr><td>情绪系统</td><td>${esc(ls.emotion)}</td></tr><tr><td>未来30天</td><td>${esc(ls.sys30)}</td></tr><tr><td>未来7天</td><td>${esc(ls.sys7)}</td></tr></table>`:`<p class="muted">还没有保存长期系统。可以点击“填入当前版本”后修改。</p>`;
+}
+function loadToday(){const d=state.daily[today()]||{};$("dailyUrgent").value=d.urgent||"";$("dailyImportant").value=d.important||"";$("dailyMin").value=d.min||"";$("dailyTomorrow").value=d.tomorrow||"";$("dailyEmotion").value=d.emotion||"焦虑";$("dailyEnergy").value=d.energy||5;$("energyVal").textContent=d.energy||5;$("dailyNote").value=d.note||"";const l=state.layers||{};$("layerUrgent").value=l.urgent||"";$("layerNear").value=l.near||"";$("layerLong").value=l.long||"";$("layerMind").value=l.mind||"";const ls=state.longSystem||{};$("sysStudy").value=ls.study||"";$("sysCert").value=ls.cert||"";$("sysEnergy").value=ls.energy||"";$("sysEmotion").value=ls.emotion||"";$("sys30").value=ls.sys30||"";$("sys7").value=ls.sys7||""}
+loadToday();render();
+</script>
+</body>
+</html>
